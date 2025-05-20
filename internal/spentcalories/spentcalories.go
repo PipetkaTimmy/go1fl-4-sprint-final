@@ -24,16 +24,30 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 		return 0, "", 0, errors.New("недопустимый формат данных")
 	}
 
-	steps, err := strconv.Atoi(parts[0])
+	if parts[0] == "" || parts[1] == "" || parts[2] == "" {
+		return 0, "", 0, errors.New("пустое значение шага, активности или продолжительности")
+	}
 
+	if strings.TrimSpace(parts[0]) != parts[0] {
+		return 0, "", 0, errors.New("пробелы в значении шагов")
+	}
+
+	steps, err := strconv.Atoi(parts[0])
 	if err != nil {
 		return 0, "", 0, errors.New("недопустимое значение шагов")
 	}
 
-	duration, err := time.ParseDuration(parts[2])
+	if steps <= 0 {
+		return 0, "", 0, errors.New("шаги должны быть больше нуля")
+	}
 
+	duration, err := time.ParseDuration(parts[2])
 	if err != nil {
 		return 0, "", 0, errors.New("неверный формат продолжительности")
+	}
+
+	if duration <= 0 {
+		return 0, "", 0, errors.New("продолжительность должна быть больше нуля")
 	}
 
 	return steps, parts[1], duration, nil
@@ -91,7 +105,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 
 	durationHours := duration.Hours()
 	result := fmt.Sprintf(
-		"Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f",
+		"Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f\n",
 		activity, durationHours, dist, speed, calories,
 	)
 
